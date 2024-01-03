@@ -7,12 +7,13 @@ import os
 import re
 from collections import namedtuple
 
+import magic
 
 # global variables
 ngram_size   = 4
 context_line = 10
 verbose_mode = False
-magic_cookie = None
+magic_cookie = magic.Magic(initial_flags=magic.flags.MAGIC_MIME)
 bloomfilter_size = 2097152
 min_mn_ratio = 32
 
@@ -51,10 +52,7 @@ whitespaces_regex = re.compile(r'[\t\x0b\x0c\r ]+')
 
 
 def file_type(file_path):
-    try:
-        return magic_cookie.from_file(file_path)
-    except AttributeError:
-        return magic_cookie.file(file_path)
+    return magic_cookie.from_file(file_path)
 
 def verbose_print(text):
     if verbose_mode:

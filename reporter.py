@@ -3,6 +3,7 @@
 #
 # Jiyong Jang, 2012
 #
+import sys
 import time
 from collections import defaultdict
 import common
@@ -74,6 +75,7 @@ class Reporter(object):
 
         print '[+] generating a report'
         start_time = time.time()
+        j = 0
 
         out = open(outfile, 'w')
         # html head - css, javascript
@@ -124,6 +126,9 @@ class Reporter(object):
             for context in context_list:
                 s = self._source_list[context.source_id]
                 # source info - prev_context
+                j += 1
+                print "[NO. %d] Vulnerable found in %s, VUL: %s" % (j, s.file_path, p.file_path)
+                sys.stdout.flush()
                 out.write("""
         <div class="source">
             <div class="filepath">%s</div>

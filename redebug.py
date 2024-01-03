@@ -4,74 +4,46 @@
 #
 # Jiyong Jang, 2012
 #
+import argparse
 import sys
 import os
-import re
 import time
+
+from tqdm import tqdm
+
 import common
+import config
+import old_new_funcs
 import patchloader
 import sourceloader
 import reporter
 
-try:
-    import argparse
-    import magic
-except ImportError as err:
-    print err
-    sys.exit(-1)
-
-
-def parse_args():
-    '''
-    Parse command line arguments
-    '''
-    parser = argparse.ArgumentParser()
-    # optional arguments
-    parser.add_argument('-n', '--ngram',\
-            action='store', dest='ngram_size', type=int, default=4, metavar='NUM',\
-            help='use n-gram of NUM lines (default: %(default)s)')
-    parser.add_argument('-c', '--context',\
-            action='store', dest='context_line', type=int, default=10, metavar='NUM',\
-            help='print NUM lines of context (default: %(default)s)')
-    parser.add_argument('-v', '--verbose',\
-            action='store_true', dest='verbose_mode', default=False,\
-            help='enable verbose mode (default: %(default)s)')
-    # positional arguments
-    parser.add_argument('patch_path', action='store', help='path to patch files (in unified diff format)')
-    parser.add_argument('source_path', action='store', help='path to source files')
-
-    try:
-        args = parser.parse_args()
-        common.ngram_size = args.ngram_size
-        common.context_line = args.context_line
-        common.verbose_mode = args.verbose_mode
-        return args.patch_path, args.source_path
-    except IOError, msg:
-        parser.error(str(msg))
-
-
 if __name__ == '__main__':
 
     # parse arguments
+    parser = argparse.ArgumentParser(description="Extract data from project dir")
+    parser.add_argument("project", type=str, help="Path to the project dir")
+    args = parser.parse_args()
+
+    Config = config.load_config()
     start_time = time.time()
-    patch_path, source_path = parse_args()
-    common.verbose_print('[-] ngram_size   : %d' % common.ngram_size)
-    common.verbose_print('[-] context_line : %d' % common.context_line)
-    common.verbose_print('[-] verbose_mode : %s' % common.verbose_mode)
-    common.verbose_print('[-] patch_path   : %s' % patch_path)
-    common.verbose_print('[-] source_path  : %s' % source_path)
+    old_new_funcs_dataset = old_new_funcs.OldNewFuncsDataset(Config.get("DEFAULT", "old_new_func_dataset_path"))
+    source_path = args.project
 
     # initialize a magic cookie pointer
-    try:
-        common.magic_cookie = magic.open(magic.MAGIC_MIME)
-        common.magic_cookie.load()
-    except AttributeError:
-        common.magic_cookie = magic.Magic(mime=True, uncompress=True)
     common.verbose_print('[-] initialized magic cookie\n')
+
+    diff_dir = os.path.join(os.getcwd(), "cache", "diff")
+    if not os.path.exists(diff_dir):
+        os.makedirs(diff_dir)
+    # dump_patch_file_to_tmp_dir
+    for vul_path, patch_path in tqdm(old_new_funcs_dataset.get_func_pairs().items()):
+        diff_file = vul_path.split("/")[-1].replace("_OLD.vul", ".diff")
+        sig = os.system('diff -uw "%s" "%s" > "%s"' % (vul_path, patch_path, os.path.join(diff_dir, diff_file)))
 
     # traverse patch files
     patch = patchloader.PatchLoader()
-    npatch = patch.traverse(patch_path)
+    npatch = patch.traverse(diff_dir)
     if npatch == 0:
         print('[!] no patch to be queried')
         sys.exit(1)
@@ -92,4 +64,3 @@ if __name__ == '__main__':
 
     elapsed_time = time.time() - start_time
     print '[+] %d matches given %d patches ... %.1fs' % (exact_nmatch, npatch, elapsed_time)
-

@@ -65,7 +65,7 @@ class Reporter(object):
         '''
         return ''.join(common.html_escape_dict.get(c,c) for c in string)
 
-    def output(self, outfile='output.html'):
+    def output(self, outfile='vul.log'):
         '''
         Perform an exact matching test and generate a report
         '''
@@ -73,110 +73,22 @@ class Reporter(object):
         if exact_nmatch == 0:
             return exact_nmatch
 
-        print '[+] generating a report'
+        print '[+] generating vul logs'
         start_time = time.time()
         j = 0
 
         out = open(outfile, 'w')
-        # html head - css, javascript
-        out.write("""
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ReDeBug - Report</title>
-    <style type="text/css">
-    .container { padding: 3px 3px 3px 3px; font-size: 14px; }
-    .patch { background-color: #CCCCCC; border: 2px solid #555555; margin: 0px 0px 5px 0px }
-    .source { background-color: #DDDDDD; padding: 3px 3px 3px 3px; margin: 0px 0px 5px 0px }
-    .filepath { font-size: small; font-weight: bold; color: #0000AA; padding: 5px 5px 5px 5px; }
-    .codechunk { font-family: monospace; font-size: small; white-space: pre-wrap; padding: 0px 0px 0px 50px; }
-    .linenumber { font-family: monospace; font-size: small; float: left; color: #777777; }
-    </style>
-    <script language="javascript">
-        function togglePrev(node) {
-            var targetDiv = node.previousSibling;
-            targetDiv.style.display = (targetDiv.style.display=='none')?'block':'none';
-            node.innerHTML = (node.innerHTML=='+ show +')?'- hide -':'+ show +';
-        }
-        function toggleNext(node) {
-            var targetDiv = node.nextSibling;
-            targetDiv.style.display = (targetDiv.style.display=='none')?'block':'none';
-            node.innerHTML = (node.innerHTML=='+ show +')?'- hide -':'+ show +';
-        }
-    </script>
-</head>
-<body>
-<div style="width: 100%; margin: 0px auto">""")
-        # unpatched code clones
-        out.write("""
-    <b># <i>unpatched code clones:</i> <font style="color:red">%d</font></b>""" % exact_nmatch)
 
         for patch_id, context_list in self._context_dict.items():
             p = self._patch_list[patch_id]
-            out.write("""
-    <div class="container">
-        <br />""")
-            # patch info
-            out.write("""
-        <div class="patch">
-            <div class="filepath">%s</div>
-            <div class="codechunk">%s</div>
-        </div>""" % (p.file_path, p.orig_lines))
 
             for context in context_list:
                 s = self._source_list[context.source_id]
                 # source info - prev_context
                 j += 1
-                print "[NO. %d] Vulnerable found in %s, VUL: %s" % (j, s.file_path, p.file_path)
+                out.write("[NO. %d] Vulnerable found in %s, VUL: %s\n" % (j, s.file_path, p.file_path))
                 sys.stdout.flush()
-                out.write("""
-        <div class="source">
-            <div class="filepath">%s</div>
-            <div style="display: none">
-                <div class="linenumber">""" % s.file_path)
 
-                for i in range(context.prev_context_line, context.start_line):
-                    out.write("""
-                %d<br />""" % (i+1))
-
-                out.write("""
-                </div>
-                <div class="codechunk">%s</div>
-            </div><a href="javascript:;" onclick="togglePrev(this);">+ show +</a>""" % self._html_escape('\n'.join(s.orig_lines[context.prev_context_line:context.start_line])))
-                # source info
-                out.write("""
-            <div>
-                <div class="linenumber">""")
-
-                for i in range(context.start_line, context.end_line):
-                    out.write("""
-                %d<br />""" % (i+1))
-
-                out.write("""
-                </div>
-                <div class="codechunk">%s</div>
-            </div>""" % self._html_escape('\n'.join(s.orig_lines[context.start_line:context.end_line])))
-                # source info - next_context
-                out.write("""
-            <a href="javascript:;" onclick="toggleNext(this);">+ show +</a><div style="display: none">
-                <div class="linenumber">""")
-
-                for i in range(context.end_line, context.next_context_line):
-                    out.write("""
-                %d<br />""" % (i+1))
-
-                out.write("""
-                </div>
-                <div class="codechunk">%s</div>
-            </div>
-        </div>""" % self._html_escape('\n'.join(s.orig_lines[context.end_line:context.next_context_line])))
-            out.write("""
-    </div>""")
-
-        out.write("""
-</div>
-</body>
-</html>""")
         out.close()
 
         elapsed_time = time.time() - start_time

@@ -1,3 +1,4 @@
+# coding=utf-8
 # sourceloader.py
 #   SourceLoader class
 #
@@ -39,7 +40,6 @@ class SourceLoader(object):
 
         if os.path.isfile(source_path):
             magic_type = common.file_type(source_path)
-            common.verbose_print('  [-] %s: %s' % (source_path, magic_type))
             if magic_type.startswith('text'):
                 main_type, sub_type = magic_type.split('/')
                 magic_ext = self._get_file_type(sub_type)
@@ -49,7 +49,6 @@ class SourceLoader(object):
                 for file in files:
                     file_path = os.path.join(root, file)
                     magic_type = common.file_type(file_path)
-                    common.verbose_print('  [-] %s: %s' % (file_path, magic_type))
                     if magic_type.startswith('text'):
                         main_type, sub_type = magic_type.split('/')
                         magic_ext = self._get_file_type(sub_type)
@@ -125,7 +124,6 @@ class SourceLoader(object):
     def _query_bloomfilter(self, source_norm_lines, magic_ext):
         source_norm_lines = source_norm_lines.split()
         if len(source_norm_lines) < common.ngram_size:
-            common.verbose_print('      - skipped (%d lines)' % len(source_norm_lines))
             return False
 
         self._bit_vector.setall(0)
@@ -134,7 +132,6 @@ class SourceLoader(object):
         num_ngram_processed = 0
         for i in range(0, num_ngram):
             if num_ngram_processed > common.bloomfilter_size/common.min_mn_ratio:
-                common.verbose_print('      - split Bloom filters (%d n-grams)' % num_ngram_processed)
                 for patch_id in range(0, self._npatch):
                     if magic_ext == self._patch_list[patch_id].file_ext:
                         hash_list = self._patch_list[patch_id].hash_list
@@ -146,7 +143,6 @@ class SourceLoader(object):
                         if is_match:
                             is_vuln_source = True
                             self._match_dict[patch_id].append(self._nsource)
-                            common.verbose_print('      - match (patch #%d : source #%d)' % (patch_id, self._nsource))
                             self._nmatch += 1
                 num_ngram_processed = 0
                 self._bit_vector.setall(0)
@@ -171,7 +167,6 @@ class SourceLoader(object):
                 if is_match:
                     is_vuln_source = True
                     self._match_dict[patch_id].append(self._nsource)
-                    common.verbose_print('      - match (patch #%d : source #%d)' % (patch_id, self._nsource))
                     self._nmatch += 1
 
         return is_vuln_source

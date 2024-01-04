@@ -1,3 +1,4 @@
+# coding=utf-8
 # reporter.py
 #   Reporter class
 #
@@ -6,9 +7,8 @@
 import sys
 import time
 from collections import defaultdict
+
 import common
-import patchloader
-import sourceloader
 
 
 class Reporter(object):
@@ -44,7 +44,6 @@ class Reporter(object):
                         source_line += 1
 
                         if patch_line == patch_norm_length:
-                            common.verbose_print('  [-] exact match - %s : %s (line #%d)' % (self._patch_list[patch_id].file_path, self._source_list[source_id].file_path, i+1))
                             self._context_dict[patch_id].append(common.ContextInfo(source_id, max(0, i-common.context_line), i, source_line, min(source_line+common.context_line, source_norm_length-1)))
                             exact_nmatch += 1
                             break
@@ -86,7 +85,7 @@ class Reporter(object):
                 s = self._source_list[context.source_id]
                 # source info - prev_context
                 j += 1
-                out.write("[NO. %d] Vulnerable found in %s, VUL: %s\n" % (j, s.file_path, p.file_path))
+                out.write("[NO. %d] Vulnerable found in %s, VUL: %s\n".encode("utf-8") % (j, s.file_path, p.file_path))
                 sys.stdout.flush()
 
         out.close()

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# coding=utf-8
 #
 # redebug.py
 #
@@ -29,9 +29,6 @@ if __name__ == '__main__':
     start_time = time.time()
     old_new_funcs_dataset = old_new_funcs.OldNewFuncsDataset(Config.get("DEFAULT", "old_new_func_dataset_path"))
     source_path = args.project
-
-    # initialize a magic cookie pointer
-    common.verbose_print('[-] initialized magic cookie\n')
 
     diff_dir = os.path.join(os.getcwd(), "cache", "diff")
     if not os.path.exists(diff_dir):

@@ -27,16 +27,15 @@ if __name__ == '__main__':
 
     Config = config.load_config()
     start_time = time.time()
-    old_new_funcs_dataset = old_new_funcs.OldNewFuncsDataset(Config.get("DEFAULT", "old_new_func_dataset_path"))
     source_path = args.project
 
     diff_dir = os.path.join(os.getcwd(), "cache", "diff")
     if not os.path.exists(diff_dir):
         os.makedirs(diff_dir)
-    # dump_patch_file_to_tmp_dir
-    for vul_path, patch_path in tqdm(old_new_funcs_dataset.get_func_pairs().items()):
-        diff_file = vul_path.split("/")[-1].replace("_OLD.vul", ".diff")
-        sig = os.system('diff -uw "%s" "%s" > "%s"' % (vul_path, patch_path, os.path.join(diff_dir, diff_file)))
+        old_new_funcs_dataset = old_new_funcs.OldNewFuncsDataset(Config.get("DEFAULT", "old_new_func_dataset_path"))
+        for vul_path, patch_path in tqdm(old_new_funcs_dataset.get_func_pairs().items()):
+            diff_file = vul_path.split("/")[-1].replace("_OLD.vul", ".diff")
+            sig = os.system('diff -uw "%s" "%s" > "%s"' % (vul_path, patch_path, os.path.join(diff_dir, diff_file)))
 
     # traverse patch files
     patch = patchloader.PatchLoader()

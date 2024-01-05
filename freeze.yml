@@ -7,12 +7,17 @@ dependencies:
   - bitarray=1.2.0=py27h7b6447c_0
   - ca-certificates=2023.12.12=h06a4308_0
   - certifi=2020.6.20=pyhd3eb1b0_3
+  - click=7.1.2=pyhd3eb1b0_0
   - colorama=0.4.4=pyhd3eb1b0_0
+  - flask=1.1.2=pyhd3eb1b0_0
+  - itsdangerous=1.1.0=py27_0
+  - jinja2=2.11.3=pyhd3eb1b0_0
   - libffi=3.4.4=h6a678d5_0
   - libgcc-ng=11.2.0=h1234567_1
   - libgomp=11.2.0=h1234567_1
   - libmagic=5.36=h27cfd23_2
   - libstdcxx-ng=11.2.0=h1234567_1
+  - markupsafe=1.1.1=py27h7b6447c_0
   - ncurses=6.4=h6a678d5_0
   - pip=19.3.1=py27_0
   - python=2.7.18=h42bf7aa_3
@@ -21,6 +26,7 @@ dependencies:
   - sqlite=3.41.2=h5eee18b_0
   - tk=8.6.12=h1ccaba5_0
   - tqdm=4.63.0=pyhd3eb1b0_0
+  - werkzeug=1.0.1=pyhd3eb1b0_0
   - wheel=0.37.1=pyhd3eb1b0_0
   - zlib=1.2.13=h5eee18b_0
   - pip:

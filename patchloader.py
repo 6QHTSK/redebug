@@ -4,10 +4,10 @@
 #
 # Jiyong Jang, 2012
 #
-import os
-import re
-import time
 import mimetypes
+import os
+import time
+
 import common
 
 
@@ -63,7 +63,7 @@ class PatchLoader(object):
                 if diff_vuln_lines:
                     diff_norm_lines = self._normalize(''.join(diff_vuln_lines), magic_ext).split()
                     if len(diff_norm_lines) >= common.ngram_size:
-                        path = '[%s] %s #%d' % (patch_filename, diff_file, diff_cnt)
+                        path = '%s' % diff_file
                         hash_list = self._build_hash_list(diff_norm_lines)
                         self._patch_list.append(common.PatchInfo(path, magic_ext, ''.join(diff_orig_lines), diff_norm_lines, hash_list))
                     del diff_vuln_lines[:]
@@ -88,7 +88,7 @@ class PatchLoader(object):
                     if diff_vuln_lines:
                         diff_norm_lines = self._normalize(''.join(diff_vuln_lines), magic_ext).split()
                         if len(diff_norm_lines) >= common.ngram_size:
-                            path = '[%s] %s #%d' % (patch_filename, diff_file, diff_cnt)
+                            path = '%s' % diff_file
                             hash_list = self._build_hash_list(diff_norm_lines)
                             self._patch_list.append(common.PatchInfo(path, magic_ext, ''.join(diff_orig_lines), diff_norm_lines, hash_list))
                         del diff_vuln_lines[:]
@@ -113,7 +113,7 @@ class PatchLoader(object):
         if diff_vuln_lines:
             diff_norm_lines = self._normalize(''.join(diff_vuln_lines), magic_ext).split()
             if len(diff_norm_lines) >= common.ngram_size:
-                path = '[%s] %s #%d' % (patch_filename, diff_file, diff_cnt)
+                path = '%s' % diff_file
                 hash_list = self._build_hash_list(diff_norm_lines)
                 self._patch_list.append(common.PatchInfo(path, magic_ext, ''.join(diff_orig_lines), diff_norm_lines, hash_list))
 
